@@ -11,6 +11,44 @@ typedef void(*funcITest)();
 
 testHarness::testHarness()
 {
+	this->t = thread([this] { runThread(); });
+	//this->t = thread(testFunction, )
+}
+
+void testHarness::sendMessage(string xmlPath)
+{
+	{
+		this->mtx.lock();
+
+		this->xmlQueue.enQ(xmlPath);
+
+		this->readyQueue.enQ("Ready");
+
+		this->mtx.unlock();
+	}
+}
+
+void testHarness::runThread()
+{
+	string msg;
+
+	do {
+		msg = this->readyQueue.deQ();
+
+		{
+			this->mtx.lock();
+
+			if (msg == "Ready") {
+
+				string xml = this->xmlQueue.deQ();
+
+				this->testFunction(xml);
+
+			}
+
+			this->mtx.unlock();
+		}
+	} while (msg != "Stop");
 }
 
 void testHarness::testFunction(string xmlPath)
@@ -44,4 +82,6 @@ void testHarness::testFunction(string xmlPath)
 
 testHarness::~testHarness()
 {
+	this->readyQueue.enQ("Stop");
+	this->t.join();
 }

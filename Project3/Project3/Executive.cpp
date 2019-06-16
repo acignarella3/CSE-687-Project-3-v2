@@ -15,6 +15,15 @@ int main()
 
 	testHarness harness;
 
-	harness.testFunction(xmlPath);
+	//harness.testFunction(xmlPath);
+
+	cout << "Sending Message 1" << endl << endl;
+	harness.sendMessage(xmlPath);
+
+	cout << "Sending Message 2" << endl << endl;
+	harness.sendMessage(xmlPath);
+
+	cout << "Sending Message 3" << endl << endl;
+	harness.sendMessage(xmlPath);
 
 }
